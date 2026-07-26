@@ -138,14 +138,14 @@ def _attach_argsort_func(bb: relax.BlockBuilder):
 
 
 @T.prim_func(s_tir=True)
-def full(var_result: T.handle, value: T.int32):
+def full(value: T.int64, var_result: T.handle):
     """The filling function for top k."""
     batch_size = T.int32()
     result = T.match_buffer(var_result, (batch_size, 1), "int32")
     for i in T.serial(batch_size):
         with T.sblock("block"):
             vi = T.axis.spatial(batch_size, i)
-            result[vi, 0] = value
+            result[vi, 0] = T.Cast("int32", value)
 
 
 def _attach_sample_with_top_p(bb: relax.BlockBuilder):
