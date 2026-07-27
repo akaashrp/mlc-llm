@@ -145,7 +145,7 @@ def full(value: T.int64, var_result: T.handle):
     for i in T.serial(batch_size):
         with T.sblock("block"):
             vi = T.axis.spatial(batch_size, i)
-            result[vi, 0] = T.Cast("int32", value)
+            result[vi, 0] = T.cast(value, "int32")
 
 
 def _attach_sample_with_top_p(bb: relax.BlockBuilder):
