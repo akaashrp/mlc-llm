@@ -97,11 +97,11 @@ class ImageProcessor(Module):
             @T.prim_func(s_tir=True)
             def crop_func(
                 image: T.handle,
-                out: T.handle,
                 top: T.int64(),
                 bottom: T.int64(),
                 left: T.int64(),
                 right: T.int64(),
+                out: T.handle,
             ):
                 T.func_attr({"op_pattern": 8, "tirx.noalias": True, "tirx.is_scheduled": 1})
                 n, c, h, w = T.int64(), T.int64(), T.int64(), T.int64()
@@ -113,9 +113,9 @@ class ImageProcessor(Module):
                     for c_idx in T.thread_binding(c, thread="blockIdx.y"):
                         for h_idx, w_idx in T.grid(out_h, out_w):
                             with T.sblock("crop"):
+                                T.writes(out_buf[n_idx, c_idx, h_idx, w_idx])
+                                T.reads(image_buf[n_idx, c_idx, h_idx + top, w_idx + left])
                                 if (h_idx + T.int64(top)) < h and (w_idx + T.int64(left)) < w:
-                                    T.writes(out_buf[n_idx, c_idx, h_idx, w_idx])
-                                    T.reads(image_buf[n_idx, c_idx, h_idx + top, w_idx + left])
                                     out_buf[n_idx, c_idx, h_idx, w_idx] = image_buf[
                                         n_idx, c_idx, h_idx + top, w_idx + left
                                     ]
@@ -238,7 +238,7 @@ class ImageProcessor(Module):
 
         def create_pad_func(left, right, fill=255):
             @T.prim_func(s_tir=True)
-            def pad_func(image: T.handle, out: T.handle, t: T.int64(), b: T.int64()):
+            def pad_func(image: T.handle, t: T.int64(), b: T.int64(), out: T.handle):
                 T.func_attr({"op_pattern": 8, "tirx.noalias": True, "tirx.is_scheduled": 1})
                 n, c, h, w = T.int64(), T.int64(), T.int64(), T.int64()
                 image_buf = T.match_buffer(image, (n, c, h, w), dtype=dtype)

@@ -81,11 +81,11 @@ class Phi3ImageEmbedding(Module):
             @T.prim_func(s_tir=True)
             def dyn_repeat_4d_tensor_func(  # pylint disable=too-many-locals
                 input_tensor: T.handle,
-                output: T.handle,
                 ch0: T.int64(),
                 ch1: T.int64(),
                 ch2: T.int64(),
                 ch3: T.int64(),
+                output: T.handle,
             ):
                 T.func_attr({"op_pattern": 8, "tirx.noalias": True, "tirx.is_scheduled": 1})
                 n, c, h, w = T.int64(), T.int64(), T.int64(), T.int64()

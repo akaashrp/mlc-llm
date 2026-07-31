@@ -526,8 +526,8 @@ def _compute_expert_id_per_block(
     @T.prim_func(s_tir=True)
     def tir_compute_expert_id_per_block(
         var_indptr: T.handle,
-        var_expert_ids: T.handle,
         M: T.int64,
+        var_expert_ids: T.handle,
     ):
         T.func_attr({"op_pattern": 8, "tirx.is_scheduled": 1})
         indptr = T.match_buffer(var_indptr, (num_experts + 1,), "int32")
