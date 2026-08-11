@@ -29,7 +29,7 @@ def test_nn_module_paged_kv_cache():
             support_sliding_window_1 = T.int64()
             R.func_attr({"num_input": 5})
             with R.dataflow():
-                paged_kv_cache: R.Object = R.call_pure_packed("mlc.create_paged_kv_cache_generic", R.shape([max_batch_size_1, max_total_seq_len_1, prefill_chunk_size_1, page_size_1, support_sliding_window_1]), R.prim_value(32), R.prim_value(32), R.prim_value(32), R.prim_value(128), R.prim_value(1), R.prim_value(1), R.prim_value(10000), R.prim_value(128), R.dtype("float16"), sinfo_args=(R.Object,))  # noqa: E501
+                paged_kv_cache: R.Object = R.call_pure_packed("mlc.create_paged_kv_cache_generic", R.str("mha"), R.shape([max_batch_size_1, max_total_seq_len_1, prefill_chunk_size_1, page_size_1, support_sliding_window_1, 1024]), R.shape([0, 32]), R.prim_value(32), R.prim_value(32), R.prim_value(32), R.prim_value(128), R.prim_value(128), R.prim_value(0), R.prim_value(0), R.prim_value(1), R.prim_value(1), R.prim_value(10000), R.str("{}"), R.prim_value(0), R.prim_value(128), R.prim_value(0), R.dtype("float16"), ty_args=R.Object)  # noqa: E501
                 gv1: R.Object = paged_kv_cache
                 R.output(gv1)
             return gv1
@@ -45,8 +45,8 @@ def test_nn_module_paged_kv_cache():
                 )
                 lv = R.call_dps_packed(
                     "vm.builtin.attention_kv_cache_attention_with_fused_qkv",
-                    (cache, R.prim_value(0), R.prim_value(T.float32(1)), reshape),
-                    out_sinfo=R.Tensor((100, 32, 128), dtype="float16"),
+                    (cache, R.prim_value(0), R.prim_value(128**-0.5), reshape),
+                    out_ty=R.Tensor((100, 32, 128), dtype="float16"),
                 )
                 reshape1: R.Tensor((1, 100, 32, 128), dtype="float16") = R.reshape(
                     lv, R.shape([1, 100, 32, 128])
