@@ -79,12 +79,10 @@ class _DequantizeTransposeFuser(PyExprMutator):
         ):
             return call
 
-        new_func_buffers = [
-            dequantize_tir_func.buffer_map[var] for var in dequantize_tir_func.params
-        ]
-        new_func_buffers[-1] = dequantize_tir_func.body.block.alloc_buffers[0]
+        new_func_params = list(dequantize_tir_func.params)
+        new_func_params[-1] = dequantize_tir_func.body.block.alloc_buffers[0]
         new_func = tirx.PrimFunc(
-            params=new_func_buffers,
+            params=new_func_params,
             body=tirx.SBlockRealize(
                 iter_values=[],
                 predicate=True,
